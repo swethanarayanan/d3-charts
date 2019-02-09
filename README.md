@@ -1,5 +1,9 @@
 # d3-charts
 
+# Repository for the code
+https://github.com/swethanarayanan/d3-charts
+
+# How to run
 The tasks are organized across html files under html folder
 
 # Dataset
@@ -103,3 +107,9 @@ Method: Ordinal -> Position
 3) For profile p3, all methods except 3,4 have no stalls
 4) For profile p4, all methods except 3 have no stalls
 5) Method 3 has the most number of stalls across all network profiles
+
+# Next Steps after submission for personal learning
+- I will host this in github pages in a single index.html after the submission. I will be using npm to manage package dependencies
+- I will port all the tasks to use d3 v5
+- Refactor the code more and make it as modular and DRY (Dont repeat yourself) as possible and follow javascript/D3 best practices
+- More animation and drill down capabilities
