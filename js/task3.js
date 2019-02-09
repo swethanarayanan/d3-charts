@@ -11,8 +11,8 @@
     // append the svg object to the body of the page
     var svg = d3.select("#task3")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
@@ -26,6 +26,7 @@
         .range([0, width])
         .domain(myGroups)
         .padding(0.01);
+        
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x))

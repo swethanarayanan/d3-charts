@@ -10,8 +10,8 @@
     // append the svg object to the body of the page
     var svg = d3.select("#task4")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");

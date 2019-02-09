@@ -2,7 +2,8 @@
 /*global d3*/
 
 function createChart(csvFile,subTitle,divToSelect) {
-// Create the parent SVG
+    
+    // Create the parent SVG
     var svgWidth = 1200;
     var svgHeight = 500;
     var marginTopValue = 100;
@@ -16,14 +17,16 @@ function createChart(csvFile,subTitle,divToSelect) {
 
     var chartSubTitleFontSize = 15;
     var chartSubTitleYCoordinate = -80;
+    var chartSubTitleXCoordinate = 300;
 
     var margin = { top: marginTopValue, right: marginRightValue, bottom: marginBottomValue, left: marginLeftValue };
     var width = svgWidth - margin.left - margin.right;
     var height = svgHeight - margin.top - margin.bottom;
+
     var svg = d3.select(divToSelect)
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom);
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     //create scales
@@ -39,24 +42,26 @@ function createChart(csvFile,subTitle,divToSelect) {
     var yAxisLeft = d3.svg.axis().scale(y0).ticks(5).orient("left");
     var yAxisRight = d3.svg.axis().scale(y1).ticks(5).orient("right");
     var tooltip = d3.select('body').append('div').attr('class', 'tooltip');
+
     //add titles 
     d3.csv(csvFile, type, function(error, data){
-        createSubtitle(subTitle, chartSubTitleYCoordinate);
-        createBarChart(data,1);
+        createSubtitle(subTitle);
+        createBarChart(data);
     });
 
-    function createSubtitle(subTitle,y){
+    //add title
+    function createSubtitle(subTitle){
         g.append("text")
             .attr("class", "chart subtitle")
-            .attr("x", 300)
-            .attr("y", y )
+            .attr("x", chartSubTitleXCoordinate)
+            .attr("y", chartSubTitleYCoordinate )
             .attr("font-family", "sans-serif")
             .attr("font-size", chartSubTitleFontSize)
             .text(subTitle);
     }
 
     //create chart
-    function createBarChart(data,i) {
+    function createBarChart(data) {
 
         data.forEach(row => {
             row.avgQuality = parseInt(row.avgQuality);
@@ -69,7 +74,7 @@ function createChart(csvFile,subTitle,divToSelect) {
 
         g.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + height*i + ")")
+            .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
             .style("font", "13px sans-serif");
 
