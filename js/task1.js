@@ -1,27 +1,29 @@
 /* eslint-disable no-unused-vars */
 /*global d3*/
 
-function createChart(csvFile,subTitle) {
+function createChart(csvFile,subTitle,divToSelect) {
 // Create the parent SVG
-    var marginTopValue = 150;
+    var svgWidth = 1200;
+    var svgHeight = 500;
+    var marginTopValue = 100;
     var marginRightValue = 150;
-    var marginBottomValue = 150;
+    var marginBottomValue = 100;
     var marginLeftValue = 150;
     var leftAxisLowerRange = 0;
     var leftAxisUpperRange = 2500;
     var rightAxisLowerRange = 0;
     var rightAxisUpperRange = 250;
 
-    var chartTitleFontSize = 20;
     var chartSubTitleFontSize = 15;
-
-    var chartTitleYCoordinate = -120;
     var chartSubTitleYCoordinate = -80;
 
-    var svg = d3.select("svg");
     var margin = { top: marginTopValue, right: marginRightValue, bottom: marginBottomValue, left: marginLeftValue };
-    var width = +svg.attr("width") - margin.left - margin.right;
-    var height = +svg.attr("height") - margin.top - margin.bottom;
+    var width = svgWidth - margin.left - margin.right;
+    var height = svgHeight - margin.top - margin.bottom;
+    var svg = d3.select(divToSelect)
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     //create scales
@@ -36,22 +38,8 @@ function createChart(csvFile,subTitle) {
         .orient("bottom");
     var yAxisLeft = d3.svg.axis().scale(y0).ticks(5).orient("left");
     var yAxisRight = d3.svg.axis().scale(y1).ticks(5).orient("right");
-
-    //add tips
-    const tip_numQuality = d3.tip().html(d => d.avgNumQualityChanges);
-    svg.call(tip_numQuality);
-    const tip_avgQuality = d3.tip().html(d => d.avgQuality);
-    svg.call(tip_avgQuality);
-
-    //add titles
-    g.append("text")
-        .attr("class", "chart title")
-        .attr("x", 0)
-        .attr("y", chartTitleYCoordinate)
-        .attr("font-family", "sans-serif")
-        .attr("font-size", chartTitleFontSize)
-        .text("Average quality and average number of changes in quality for a method");
-
+    var tooltip = d3.select('body').append('div').attr('class', 'tooltip');
+    //add titles 
     d3.csv(csvFile, type, function(error, data){
         createSubtitle(subTitle, chartSubTitleYCoordinate);
         createBarChart(data,1);
@@ -60,7 +48,7 @@ function createChart(csvFile,subTitle) {
     function createSubtitle(subTitle,y){
         g.append("text")
             .attr("class", "chart subtitle")
-            .attr("x", 0)
+            .attr("x", 300)
             .attr("y", y )
             .attr("font-family", "sans-serif")
             .attr("font-size", chartSubTitleFontSize)
@@ -119,8 +107,19 @@ function createChart(csvFile,subTitle) {
             .attr("width", x.rangeBand()/2)
             .attr("y", function(d) { return y0(d.avgQuality); })
             .attr("height", function(d) { return height - y0(d.avgQuality); })
-            .on("mouseover", tip_avgQuality.show)
-            .on("mouseout", tip_avgQuality.hide);
+            .on('mousemove', function (d) {
+                tooltip
+                    .style('left', d3.event.pageX - 50 + 'px')
+                    .style('top', d3.event.pageY - 70 + 'px')
+                    .style('display', 'inline-block')
+                    .html(
+                    '<strong> Avg Quality : ' + Math.round(d.avgQuality * 100) / 100 + ' Kbps </strong>'
+                    )
+            })
+            .on('mouseout', function (d) {
+                tooltip.style('display', 'none');
+            });
+    
 
         bars.append("rect")
             .attr("class", "bar2")
@@ -128,8 +127,18 @@ function createChart(csvFile,subTitle) {
             .attr("width", x.rangeBand() / 2)
             .attr("y", function(d) { return y1(d.avgNumQualityChanges); })
             .attr("height", function(d) { return height - y1(d.avgNumQualityChanges); })
-            .on("mouseover", tip_numQuality.show)
-            .on("mouseout", tip_numQuality.hide);
+            .on('mousemove', function (d) {
+                tooltip
+                    .style('left', d3.event.pageX - 50 + 'px')
+                    .style('top', d3.event.pageY - 70 + 'px')
+                    .style('display', 'inline-block')
+                    .html(
+                    '<strong> Avg Changes in Quality : ' + Math.round(d.avgNumQualityChanges * 100) / 100  + '</strong>'
+                    )
+            })
+            .on('mouseout', function (d) {
+                tooltip.style('display', 'none');
+            });
     }
 
     function type(d) {

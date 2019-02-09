@@ -7,10 +7,6 @@ var width = +svg.attr("width") - margin.left - margin.right;
 var height = +svg.attr("height") - margin.top - margin.bottom;
 var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//call tips
-const tip = d3.tip().html(d => d.value);
-svg.call(tip);
-
 //create scales
 //The scale spacing the groups:
 var x0 = d3.scaleBand()
@@ -29,14 +25,16 @@ var y = d3.scaleLinear()
 var z = d3.scaleOrdinal()
     .range(["#f3babc", "#ec838a","#de425b"]);
 
+var tooltip = d3.select('body').append('div').attr('class', 'tooltip');
+
 // Add chart title
 g.append("text")
     .attr("class", "chart title")
-    .attr("x", 0)
-    .attr("y", -30)
+    .attr("x", 220)
+    .attr("y", -50)
     .attr("font-family", "sans-serif")
     .attr("font-size", 15)
-    .text("Average QoE for a method grouped by different buffer configurations");
+    .text("Dynamic Bar Chart : Select/unselect buffer configuration from the right");
 
 // Add x-axis title
 g.append("text")
@@ -45,7 +43,7 @@ g.append("text")
     .attr("y", height + 40);
 
 //draw chart
-d3.csv("Task2.csv", function(d, i, columns) {
+d3.csv("../data/task2.csv", function(d, i, columns) {
     for (i = 1; i < columns.length; ++i) d[columns[i]] = +d[columns[i]];
     return d;
 }, function(error, data) {
@@ -75,21 +73,40 @@ d3.csv("Task2.csv", function(d, i, columns) {
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.value); })
         .attr("fill", function(d) { return z(d.key); })
-        .on("mouseover", tip.show)
-        .on("mouseout", tip.hide);
+        .on('mousemove', function (d) {
+            tooltip
+                .style('left', d3.event.pageX - 50 + 'px')
+                .style('top', d3.event.pageY - 70 + 'px')
+                .style('display', 'inline-block')
+                .html(
+                '<strong> Avg QoE : ' + (d.value / 1000).toFixed(0) + 'k </strong>'
+                )
+        })
+        .on('mouseout', function (d) {
+            tooltip.style('display', 'none');
+        });
 
     g.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x0))
-        .style("font", "13px sans-serif");
+        .style("font", "13px sans-serif")
+        .append("text")
+        .attr("x", 850)
+        .attr("y", 40)
+        .attr("dy", "0.32em")
+        .attr("fill", "#000")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 15)
+        .attr("text-anchor", "start")
+        .text("Streaming Method");
 
     g.append("g")
         .attr("class", "y axis")
         .call(d3.axisLeft(y).ticks(null, "s"))
         .style("font", "13px sans-serif")
         .append("text")
-        .attr("x", 10)
+        .attr("x", -140)
         .attr("y", y(y.ticks().pop()) + 0.5)
         .attr("dy", "0.32em")
         .attr("fill", "#000")
